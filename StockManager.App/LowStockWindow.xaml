@@ -1,0 +1,17 @@
+﻿<Window x:Class="StockManager.App.LowStockWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Low Stock Report" Height="480" Width="640"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="12">
+        <TextBlock x:Name="CountText" DockPanel.Dock="Top" FontWeight="Bold" Margin="0,0,0,8"/>
+        <DataGrid x:Name="LowGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
+                <DataGridTextColumn Header="Reorder level" Binding="{Binding ReorderLevel}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup />
+  <ItemGroup>
+    <Compile Update="AdjustmentWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="LowStockWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="ReceiptWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="ReportsWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="SaleWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="AdjustmentWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="LowStockWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ReceiptWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ReportsWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="SaleWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+</Project>

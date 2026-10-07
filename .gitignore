@@ -1,0 +1,4 @@
+publish/
+installer/
+*.db
+StockManagerBackups/

@@ -1,0 +1,92 @@
+﻿<Window x:Class="StockManager.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Stock Manager - Products" Height="600" Width="1050">
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="320"/>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0" Margin="0,0,12,0">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                <Button Content="Goods Receipt" Click="OpenReceipt_Click" Width="100" Margin="0,0,6,0"/>
+                <Button Content="New Sale" Click="OpenSale_Click" Width="80" Margin="0,0,6,0"/>
+                <Button Content="Adjust Stock" Click="OpenAdjust_Click" Width="90" Margin="0,0,6,0"/>
+                <Button Content="Low Stock" Click="OpenLowStock_Click" Width="80" Margin="0,0,6,0"/>
+                <Button Content="Backup now" Click="Backup_Click" Width="90"/>
+                <Button Content="Reports" Click="OpenReports_Click" Width="70" Margin="6,0,0,0"/>
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Top" Text="Search (name, SKU, barcode)"/>
+            <TextBox DockPanel.Dock="Top" Margin="0,2,0,8"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+            <DataGrid ItemsSource="{Binding Products}"
+                      SelectedItem="{Binding SelectedProduct}"
+                      AutoGenerateColumns="False" IsReadOnly="True"
+                      SelectionMode="Single" CanUserAddRows="False">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLow}" Value="True">
+                                <Setter Property="Background" Value="#FFFFE0E0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"/>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Category" Binding="{Binding Category.Name}"/>
+                    <DataGridTextColumn Header="Unit" Binding="{Binding Unit}"/>
+                    <DataGridTextColumn Header="Retail" Binding="{Binding RetailPrice, StringFormat=N2}"/>
+                    <DataGridTextColumn Header="Wholesale" Binding="{Binding WholesalePrice, StringFormat=N2}"/>
+                    <DataGridTextColumn Header="Reorder" Binding="{Binding ReorderLevel}"/>
+                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Product details" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/>
+
+                <TextBlock Text="SKU *"/>
+                <TextBox Text="{Binding Editing.Sku, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
+
+                <TextBlock Text="Barcode"/>
+                <TextBox Text="{Binding Editing.Barcode}" Margin="0,2,0,8"/>
+
+                <TextBlock Text="Name *"/>
+                <TextBox Text="{Binding Editing.Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
+
+                <TextBlock Text="Category *"/>
+                <ComboBox ItemsSource="{Binding Categories}" DisplayMemberPath="Name"
+                          SelectedValuePath="Id" SelectedValue="{Binding Editing.CategoryId}"
+                          Margin="0,2,0,8"/>
+
+                <TextBlock Text="Unit"/>
+                <TextBox Text="{Binding Editing.Unit}" Margin="0,2,0,8"/>
+
+                <TextBlock Text="Cost price"/>
+                <TextBox Text="{Binding Editing.CostPrice, StringFormat=N2}" Margin="0,2,0,8"/>
+
+                <TextBlock Text="Retail price"/>
+                <TextBox Text="{Binding Editing.RetailPrice, StringFormat=N2}" Margin="0,2,0,8"/>
+
+                <TextBlock Text="Wholesale price"/>
+                <TextBox Text="{Binding Editing.WholesalePrice, StringFormat=N2}" Margin="0,2,0,8"/>
+
+                <TextBlock Text="Reorder level"/>
+                <TextBox Text="{Binding Editing.ReorderLevel}" Margin="0,2,0,12"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="New" Command="{Binding NewProductCommand}" Width="80" Margin="0,0,8,0"/>
+                    <Button Content="Save" Command="{Binding SaveCommand}" Width="80" Margin="0,0,8,0"/>
+                    <Button Content="Remove" Command="{Binding DeleteCommand}" Width="80"/>
+                </StackPanel>
+
+                <TextBlock Text="{Binding Message}" Margin="0,10,0,0" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

@@ -1,0 +1,158 @@
+﻿using System.Collections.ObjectModel;
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
+using StockManager.Core;
+using StockManager.Data;
+
+namespace StockManager.App.ViewModels;
+
+public partial class ProductsViewModel : ObservableObject
+{
+    public ObservableCollection<Product> Products { get; } = new();
+    public ObservableCollection<Category> Categories { get; } = new();
+
+    [ObservableProperty] private Product? selectedProduct;
+    [ObservableProperty] private Product editing = new();
+    [ObservableProperty] private string searchText = "";
+    [ObservableProperty] private string message = "";
+
+    partial void OnSearchTextChanged(string value) => _ = LoadProductsAsync();
+
+    partial void OnSelectedProductChanged(Product? value)
+    {
+        if (value is null) return;
+        Editing = new Product
+        {
+            Id = value.Id,
+            Sku = value.Sku,
+            Barcode = value.Barcode,
+            Name = value.Name,
+            CategoryId = value.CategoryId,
+            Unit = value.Unit,
+            CostPrice = value.CostPrice,
+            RetailPrice = value.RetailPrice,
+            WholesalePrice = value.WholesalePrice,
+            ReorderLevel = value.ReorderLevel,
+            IsActive = value.IsActive
+        };
+        Message = "";
+    }
+
+    public async Task InitAsync()
+    {
+        using var db = new AppDbContext();
+        await db.Database.MigrateAsync();
+
+        if (!await db.Categories.AnyAsync())
+        {
+            db.Categories.Add(new Category { Name = "General" });
+            await db.SaveChangesAsync();
+        }
+
+        Categories.Clear();
+        foreach (var c in await db.Categories.OrderBy(c => c.Name).ToListAsync())
+            Categories.Add(c);
+
+        await LoadProductsAsync();
+        NewProduct();
+    }
+
+    private async Task LoadProductsAsync()
+    {
+        using var db = new AppDbContext();
+        var q = db.Products.Include(p => p.Category).Where(p => p.IsActive);
+
+        var s = SearchText?.Trim();
+        if (!string.IsNullOrEmpty(s))
+            q = q.Where(p => p.Name.Contains(s) || p.Sku.Contains(s)
+                          || (p.Barcode != null && p.Barcode.Contains(s)));
+
+        var list = await q.OrderBy(p => p.Name).ToListAsync();
+
+        var stocks = await db.StockMovements
+            .GroupBy(m => m.ProductId)
+            .Select(g => new { Id = g.Key, Qty = g.Sum(x => x.Quantity) })
+            .ToDictionaryAsync(x => x.Id, x => x.Qty);
+
+        Products.Clear();
+        foreach (var p in list)
+        {
+            p.Stock = stocks.GetValueOrDefault(p.Id);
+            Products.Add(p);
+        }
+    }
+
+    public Task RefreshAsync() => LoadProductsAsync();
+
+    [RelayCommand]
+    private void NewProduct()
+    {
+        SelectedProduct = null;
+        Editing = new Product { CategoryId = Categories.FirstOrDefault()?.Id ?? 0 };
+        Message = "";
+    }
+
+    [RelayCommand]
+    private async Task SaveAsync()
+    {
+        var p = Editing;
+        if (string.IsNullOrWhiteSpace(p.Sku) || string.IsNullOrWhiteSpace(p.Name) || p.CategoryId == 0)
+        {
+            Message = "SKU, Name and Category are required.";
+            return;
+        }
+
+        try
+        {
+            using var db = new AppDbContext();
+            var entity = new Product
+            {
+                Id = p.Id,
+                Sku = p.Sku.Trim(),
+                Barcode = string.IsNullOrWhiteSpace(p.Barcode) ? null : p.Barcode.Trim(),
+                Name = p.Name.Trim(),
+                CategoryId = p.CategoryId,
+                Unit = string.IsNullOrWhiteSpace(p.Unit) ? "pcs" : p.Unit.Trim(),
+                CostPrice = p.CostPrice,
+                RetailPrice = p.RetailPrice,
+                WholesalePrice = p.WholesalePrice,
+                ReorderLevel = p.ReorderLevel,
+                IsActive = true
+            };
+
+            if (entity.Id == 0) db.Products.Add(entity);
+            else db.Products.Update(entity);
+
+            await db.SaveChangesAsync();
+            await LoadProductsAsync();
+            SelectedProduct = Products.FirstOrDefault(x => x.Id == entity.Id);
+            Message = "Saved.";
+        }
+        catch (DbUpdateException)
+        {
+            Message = "Save failed. The SKU may already exist.";
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteAsync()
+    {
+        if (Editing.Id == 0) return;
+        if (MessageBox.Show($"Remove '{Editing.Name}'?", "Confirm",
+                MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
+
+        using var db = new AppDbContext();
+        var entity = await db.Products.FindAsync(Editing.Id);
+        if (entity != null)
+        {
+            entity.IsActive = false;   // soft delete keeps movement history intact
+            await db.SaveChangesAsync();
+        }
+
+        await LoadProductsAsync();
+        NewProduct();
+        Message = "Removed.";
+    }
+}
