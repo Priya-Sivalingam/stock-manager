@@ -14,6 +14,3 @@ stock valuation and sales reports (CSV export), daily backup.
 
 ## Docs
 User manual and developer guide are in the `docs/` folder.
-
-## License
-Add one (for example MIT) or keep private.
