@@ -16,6 +16,7 @@
                 <Button Content="Low Stock" Click="OpenLowStock_Click" Width="80" Margin="0,0,6,0"/>
                 <Button Content="Reports" Click="OpenReports_Click" Width="70" Margin="0,0,6,0"/>
                 <Button Content="Backup now" Click="Backup_Click" Width="90"/>
+                <Button Content="Categories / Suppliers" Click="OpenLists_Click" Width="140" Margin="6,0,0,0"/>
             </StackPanel>
 
             <TextBlock DockPanel.Dock="Top" Text="Scan QR / barcode to find or add a product"/>
@@ -88,6 +89,11 @@
 
                 <TextBlock Text="Reorder level"/>
                 <TextBox Text="{Binding Editing.ReorderLevel}" Margin="0,2,0,12"/>
+
+                <TextBlock Text="Supplier"/>
+                <ComboBox ItemsSource="{Binding Suppliers}" DisplayMemberPath="Name"
+          SelectedValuePath="Id" SelectedValue="{Binding Editing.SupplierId}"
+          Margin="0,2,0,8"/>
 
                 <StackPanel Orientation="Horizontal">
                     <Button Content="New" Command="{Binding NewProductCommand}" Width="80" Margin="0,0,8,0"/>

@@ -5,6 +5,9 @@
     <Compile Update="AdjustmentWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="ListsWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="LowStockWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -20,6 +23,9 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="AdjustmentWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ListsWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="LowStockWindow.xaml">

@@ -12,6 +12,7 @@ public partial class ProductsViewModel : ObservableObject
 {
     public ObservableCollection<Product> Products { get; } = new();
     public ObservableCollection<Category> Categories { get; } = new();
+    public ObservableCollection<Supplier> Suppliers { get; } = new();
 
     [ObservableProperty] private Product? selectedProduct;
     [ObservableProperty] private Product editing = new();
@@ -37,6 +38,7 @@ public partial class ProductsViewModel : ObservableObject
         Barcode = v.Barcode,
         Name = v.Name,
         CategoryId = v.CategoryId,
+        SupplierId = v.SupplierId,
         Unit = v.Unit,
         CostPrice = v.CostPrice,
         RetailPrice = v.RetailPrice,
@@ -56,11 +58,24 @@ public partial class ProductsViewModel : ObservableObject
             await db.SaveChangesAsync();
         }
 
+        await ReloadListsAsync();
+        await LoadProductsAsync();
+    }
+
+    // Reloads the category and supplier dropdowns, then clears the form
+    public async Task ReloadListsAsync()
+    {
+        using var db = new AppDbContext();
+
         Categories.Clear();
         foreach (var c in await db.Categories.OrderBy(c => c.Name).ToListAsync())
             Categories.Add(c);
 
-        await LoadProductsAsync();
+        Suppliers.Clear();
+        Suppliers.Add(new Supplier { Id = 0, Name = "(none)" });
+        foreach (var s in await db.Suppliers.OrderBy(s => s.Name).ToListAsync())
+            Suppliers.Add(s);
+
         NewProduct();
     }
 
@@ -150,6 +165,7 @@ public partial class ProductsViewModel : ObservableObject
                 Barcode = string.IsNullOrWhiteSpace(p.Barcode) ? null : p.Barcode.Trim(),
                 Name = p.Name.Trim(),
                 CategoryId = p.CategoryId,
+                SupplierId = p.SupplierId is null or 0 ? null : p.SupplierId,
                 Unit = string.IsNullOrWhiteSpace(p.Unit) ? "pcs" : p.Unit.Trim(),
                 CostPrice = p.CostPrice,
                 RetailPrice = p.RetailPrice,

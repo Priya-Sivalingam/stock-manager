@@ -61,4 +61,10 @@ public partial class MainWindow : Window
             MessageBox.Show("Backup failed: " + ex.Message, "Backup");
         }
     }
+    private async void OpenLists_Click(object sender, RoutedEventArgs e)
+    {
+        new ListsWindow { Owner = this }.ShowDialog();
+        await _vm.ReloadListsAsync();
+        await _vm.RefreshAsync();
+    }
 }
