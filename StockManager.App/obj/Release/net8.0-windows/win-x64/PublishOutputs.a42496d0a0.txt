@@ -1,4 +1,0 @@
-C:\Users\Q50\OneDrive\Desktop\Stock management\publish\StockManager.App.pdb
-C:\Users\Q50\OneDrive\Desktop\Stock management\publish\StockManager.Core.pdb
-C:\Users\Q50\OneDrive\Desktop\Stock management\publish\StockManager.Data.pdb
-C:\Users\Q50\OneDrive\Desktop\Stock management\publish\StockManager.App.exe

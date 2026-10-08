@@ -8,7 +8,13 @@ public partial class SaleWindow : Window
     public SaleWindow()
     {
         InitializeComponent();
-        DataContext = new SaleViewModel();
+        var vm = new SaleViewModel();
+        DataContext = vm;
         Loaded += (_, _) => ScanBox.Focus();
+        vm.Cart.CollectionChanged += (_, _) => ScanBox.Focus();
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SaleViewModel.Message)) ScanBox.Focus();
+        };
     }
 }

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="StockManager.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Stock Manager - Products" Height="600" Width="1050">
+        Title="Stock Manager - Products" Height="600" Width="1100">
     <Grid Margin="12">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -14,12 +14,22 @@
                 <Button Content="New Sale" Click="OpenSale_Click" Width="80" Margin="0,0,6,0"/>
                 <Button Content="Adjust Stock" Click="OpenAdjust_Click" Width="90" Margin="0,0,6,0"/>
                 <Button Content="Low Stock" Click="OpenLowStock_Click" Width="80" Margin="0,0,6,0"/>
+                <Button Content="Reports" Click="OpenReports_Click" Width="70" Margin="0,0,6,0"/>
                 <Button Content="Backup now" Click="Backup_Click" Width="90"/>
-                <Button Content="Reports" Click="OpenReports_Click" Width="70" Margin="6,0,0,0"/>
             </StackPanel>
+
+            <TextBlock DockPanel.Dock="Top" Text="Scan QR / barcode to find or add a product"/>
+            <TextBox DockPanel.Dock="Top" Margin="0,2,0,8"
+                     Text="{Binding ScanText, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding ScanCommand}"/>
+                </TextBox.InputBindings>
+            </TextBox>
+
             <TextBlock DockPanel.Dock="Top" Text="Search (name, SKU, barcode)"/>
             <TextBox DockPanel.Dock="Top" Margin="0,2,0,8"
                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+
             <DataGrid ItemsSource="{Binding Products}"
                       SelectedItem="{Binding SelectedProduct}"
                       AutoGenerateColumns="False" IsReadOnly="True"
@@ -38,10 +48,10 @@
                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                     <DataGridTextColumn Header="Category" Binding="{Binding Category.Name}"/>
                     <DataGridTextColumn Header="Unit" Binding="{Binding Unit}"/>
+                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
                     <DataGridTextColumn Header="Retail" Binding="{Binding RetailPrice, StringFormat=N2}"/>
                     <DataGridTextColumn Header="Wholesale" Binding="{Binding WholesalePrice, StringFormat=N2}"/>
                     <DataGridTextColumn Header="Reorder" Binding="{Binding ReorderLevel}"/>
-                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>
@@ -57,7 +67,7 @@
                 <TextBox Text="{Binding Editing.Barcode}" Margin="0,2,0,8"/>
 
                 <TextBlock Text="Name *"/>
-                <TextBox Text="{Binding Editing.Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
+                <TextBox x:Name="NameBox" Text="{Binding Editing.Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
 
                 <TextBlock Text="Category *"/>
                 <ComboBox ItemsSource="{Binding Categories}" DisplayMemberPath="Name"

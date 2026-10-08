@@ -52,8 +52,10 @@ public partial class SaleViewModel : ObservableObject
         if (code == "") return;
         if (AddQty <= 0) { Message = "Quantity must be at least 1."; return; }
 
+        var upper = code.ToUpper();
+
         using var db = new AppDbContext();
-        var p = await db.Products.FirstOrDefaultAsync(x => x.IsActive && (x.Barcode == code || x.Sku == code));
+        var p = await db.Products.FirstOrDefaultAsync(x => x.IsActive && (x.Barcode == code || x.Sku.ToUpper() == upper));
         if (p == null) { Message = $"No product found for '{code}'."; return; }
 
         var line = Cart.FirstOrDefault(l => l.Product.Id == p.Id);

@@ -1,4 +1,10 @@
+.vs/
+bin/
+obj/
 publish/
 installer/
+*.user
 *.db
+*.db-shm
+*.db-wal
 StockManagerBackups/

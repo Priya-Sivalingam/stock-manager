@@ -12,6 +12,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = _vm;
+        _vm.NewCodeScanned += () => NameBox.Focus();
+
         Loaded += async (_, _) =>
         {
             await _vm.InitAsync();
@@ -42,6 +44,11 @@ public partial class MainWindow : Window
         new LowStockWindow { Owner = this }.ShowDialog();
     }
 
+    private void OpenReports_Click(object sender, RoutedEventArgs e)
+    {
+        new ReportsWindow { Owner = this }.ShowDialog();
+    }
+
     private async void Backup_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -53,10 +60,5 @@ public partial class MainWindow : Window
         {
             MessageBox.Show("Backup failed: " + ex.Message, "Backup");
         }
-    }
-
-    private void OpenReports_Click(object sender, RoutedEventArgs e)
-    {
-        new ReportsWindow { Owner = this }.ShowDialog();
     }
 }

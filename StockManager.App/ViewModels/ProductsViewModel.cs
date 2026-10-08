@@ -16,29 +16,34 @@ public partial class ProductsViewModel : ObservableObject
     [ObservableProperty] private Product? selectedProduct;
     [ObservableProperty] private Product editing = new();
     [ObservableProperty] private string searchText = "";
+    [ObservableProperty] private string scanText = "";
     [ObservableProperty] private string message = "";
+
+    public event Action? NewCodeScanned;
 
     partial void OnSearchTextChanged(string value) => _ = LoadProductsAsync();
 
     partial void OnSelectedProductChanged(Product? value)
     {
         if (value is null) return;
-        Editing = new Product
-        {
-            Id = value.Id,
-            Sku = value.Sku,
-            Barcode = value.Barcode,
-            Name = value.Name,
-            CategoryId = value.CategoryId,
-            Unit = value.Unit,
-            CostPrice = value.CostPrice,
-            RetailPrice = value.RetailPrice,
-            WholesalePrice = value.WholesalePrice,
-            ReorderLevel = value.ReorderLevel,
-            IsActive = value.IsActive
-        };
+        Editing = Copy(value);
         Message = "";
     }
+
+    private static Product Copy(Product v) => new()
+    {
+        Id = v.Id,
+        Sku = v.Sku,
+        Barcode = v.Barcode,
+        Name = v.Name,
+        CategoryId = v.CategoryId,
+        Unit = v.Unit,
+        CostPrice = v.CostPrice,
+        RetailPrice = v.RetailPrice,
+        WholesalePrice = v.WholesalePrice,
+        ReorderLevel = v.ReorderLevel,
+        IsActive = v.IsActive
+    };
 
     public async Task InitAsync()
     {
@@ -85,6 +90,37 @@ public partial class ProductsViewModel : ObservableObject
     }
 
     public Task RefreshAsync() => LoadProductsAsync();
+
+    [RelayCommand]
+    private async Task ScanAsync()
+    {
+        var code = ScanText.Trim();
+        ScanText = "";
+        if (code == "") return;
+
+        using var db = new AppDbContext();
+        var upper = code.ToUpper();
+        var found = await db.Products.FirstOrDefaultAsync(
+            p => p.IsActive && (p.Barcode == code || p.Sku.ToUpper() == upper));
+
+        SelectedProduct = null;
+        if (found != null)
+        {
+            Editing = Copy(found);
+            Message = $"Found: {found.Name}";
+        }
+        else
+        {
+            Editing = new Product
+            {
+                CategoryId = Categories.FirstOrDefault()?.Id ?? 0,
+                Barcode = code,
+                Sku = code
+            };
+            Message = "New code. Enter the name and prices, then Save.";
+            NewCodeScanned?.Invoke();
+        }
+    }
 
     [RelayCommand]
     private void NewProduct()
